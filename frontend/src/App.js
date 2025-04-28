@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Navbar from './Navbar';
+import { useClerk } from '@clerk/clerk-react';
+import './App.css';
 
 function App() {
   const localVideoRef = useRef(null);
@@ -7,6 +9,7 @@ function App() {
   const peerRef = useRef(null);
   const [error, setError] = useState(null);
   const [status, setStatus] = useState('disconnected');
+  const { signOut } = useClerk();
 
   useEffect(() => {
     startWebRTC();
@@ -24,7 +27,6 @@ function App() {
       console.log('Starting WebRTC connection...');
       
       // Get user media
-
       // const stream = await navigator.mediaDevices.getUserMedia({ 
       //   video: { 
       //     width: { ideal: 640 },
@@ -38,20 +40,6 @@ function App() {
       //   localVideoRef.current.srcObject = stream;
       // }
       //code commented dont want the user media 
-
-      const stream = await navigator.mediaDevices.getUserMedia({ 
-        video: { 
-          width: { ideal: 640 },
-          height: { ideal: 480 }
-        }
-      });
-      console.log('Got media stream:', stream.getVideoTracks()[0].getSettings());
-
-      // Set local video
-      if (localVideoRef.current) {
-        localVideoRef.current.srcObject = stream;
-      }
-
 
       // Create peer connection
       const pc = new RTCPeerConnection({
@@ -79,18 +67,11 @@ function App() {
       };
 
       // Add local stream to peer connection
-
       // stream.getTracks().forEach(track => {
       //   console.log('Adding track to peer connection:', track.kind);
       //   pc.addTrack(track, stream);
       // });
       //dont want local steam
-
-      stream.getTracks().forEach(track => {
-        console.log('Adding track to peer connection:', track.kind);
-        pc.addTrack(track, stream);
-      });
-
 
       // Create and send offer
       const offer = await pc.createOffer();
@@ -124,27 +105,13 @@ function App() {
   };
 
   return (
-    <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '20px' }}>
+    <div className="App">
+
+     {/* <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '20px' }}> */}
       <Navbar/>
       <h1>YOLO Detection</h1>
-
   
       <div style={{ display: 'flex', gap: '20px', marginBottom: '20px' }}>
-        <div style={{ flex: 1 }}>
-
-      
-      <div style={{ display: 'flex', gap: '20px', marginBottom: '20px' }}>
-        <div style={{ flex: 1 }}>
-          <h3>Local Stream</h3>
-          <video
-            ref={localVideoRef}
-            autoPlay
-            playsInline
-            muted
-            style={{ width: '100%', border: '2px solid red' }}
-          />
-        </div>
-        
         <div style={{ flex: 1 }}>
           <h3>Remote Stream (From Server)</h3>
           <video
@@ -155,28 +122,24 @@ function App() {
           />
         </div>
       </div>
-
-      <div style={{
+      <div className="status-box">
+      {/* <div style={{
         padding: '10px',
         backgroundColor: '#f0f0f0',
         borderRadius: '4px',
         marginBottom: '10px'
-      }}>
+      }}> */}
         Status: {status}
       </div>
-
+  
       {error && (
-        <div style={{
-          padding: '10px',
-          backgroundColor: '#ffebee',
-          color: '#c62828',
-          borderRadius: '4px'
-        }}>
+        <div className="error-box">
+       
           Error: {error}
         </div>
       )}
-
-      <button 
+  
+      {/* <button 
         onClick={startWebRTC}
         style={{
           marginTop: '10px',
@@ -190,15 +153,56 @@ function App() {
       >
         Restart Connection
       </button>
+      <button 
+    onClick={() => signOut()}
+    style={{
+      padding: '10px 20px',
+      backgroundColor: '#f44336',
+      color: 'white',
+      border: 'none',
+      borderRadius: '4px',
+      cursor: 'pointer'
+    }}
+  >
+    Sign Out
+  </button> */}
+
+{/* <div style={{ display: 'flex', gap: '20px', marginTop: '20px' }}> */}
+<div className="button-group">
+  <button 
+    onClick={startWebRTC} 
+    style={{
+      flex: 1,
+      padding: '10px 20px',
+      backgroundColor: '#2196F3',
+      color: 'white',
+      border: 'none',
+      borderRadius: '8px',
+      cursor: 'pointer'
+    }}
+  >
+    Restart Connection
+  </button>
+
+  <button 
+    onClick={() => signOut()} 
+    style={{
+      flex: 1,
+      padding: '10px 20px',
+      backgroundColor: '#f44336',
+      color: 'white',
+      border: 'none',
+      borderRadius: '8px',
+      cursor: 'pointer'
+    }}
+  >
+    Sign Out
+  </button>
+</div>
     </div>
   );
-
   
   
-}
-
-
-
 }
 
 
